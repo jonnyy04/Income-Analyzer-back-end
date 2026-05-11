@@ -2,11 +2,9 @@ import { useMemo, useState } from "react";
 import AddEntry from "../components/AddEntry";
 import StatCard from "../components/StatCard";
 import { MONTHS, fmt } from "../utils/helpers";
-import { seedSampleData } from "../utils/sampleData";
 import { downloadEntriesAsJSON } from "../utils/downloadData";
 
-export default function DashboardPage({ entries, onAdd }) {
-	const [sampleMsg, setSampleMsg] = useState(null);
+export default function DashboardPage({ entries, onAdd, isLoading }) {
 	const [downloadMsg, setDownloadMsg] = useState(null);
 	const now = new Date();
 	const curMonth = now.getMonth() + 1;
@@ -27,24 +25,12 @@ export default function DashboardPage({ entries, onAdd }) {
 
 	const recentEntries = useMemo(() => [...entries].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5), [entries]);
 
-	const handleLoadSample = () => {
-		const result = seedSampleData();
-		setSampleMsg(result);
-		setTimeout(() => setSampleMsg(null), 4000);
-
-		// Reload page to show new data - wait longer to ensure localStorage is written
-		if (result.success) {
-			setTimeout(() => {
-				// Force refresh by adding timestamp to prevent caching
-				window.location.href = window.location.href.split("#")[0] + "?refresh=" + Date.now();
-			}, 2000);
-		}
-	};
 	const handleDownloadData = () => {
-		const result = downloadEntriesAsJSON();
+		const result = downloadEntriesAsJSON(entries);
 		setDownloadMsg(result);
 		setTimeout(() => setDownloadMsg(null), 4000);
 	};
+
 	return (
 		<div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
 			{/* Header */}
@@ -54,28 +40,15 @@ export default function DashboardPage({ entries, onAdd }) {
 					<div style={{ fontSize: 13, color: "var(--color-text2)" }}>{now.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
 				</div>
 				<div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "flex-end" }}>
-					<button
-						onClick={handleLoadSample}
-						style={{
-							padding: "8px 14px",
-							background: "var(--color-accent)",
-							color: "white",
-							border: "none",
-							borderRadius: 8,
-							fontSize: 13,
-							fontWeight: 600,
-							cursor: "pointer",
-							whiteSpace: "nowrap",
-							transition: "all 0.2s",
-							boxShadow: "0 2px 8px rgba(37,99,235,0.2)",
-						}}
-						onMouseOver={(e) => (e.target.style.opacity = "0.85")}
-						onMouseOut={(e) => (e.target.style.opacity = "1")}
-					>
-						 Load Sample Data
-					</button>
+					{isLoading && (
+						<div style={{ fontSize: 13, color: "var(--color-text2)", display: "flex", alignItems: "center", gap: 8 }}>
+							<span style={{ display: "inline-block", animation: "spin 1s linear infinite" }}>⏳</span>
+							Loading...
+						</div>
+					)}
 					<button
 						onClick={handleDownloadData}
+						disabled={isLoading}
 						style={{
 							padding: "8px 14px",
 							background: "var(--color-green)",
@@ -84,15 +57,16 @@ export default function DashboardPage({ entries, onAdd }) {
 							borderRadius: 8,
 							fontSize: 13,
 							fontWeight: 600,
-							cursor: "pointer",
+							cursor: isLoading ? "not-allowed" : "pointer",
 							whiteSpace: "nowrap",
 							transition: "all 0.2s",
 							boxShadow: "0 2px 8px rgba(16,185,129,0.2)",
+							opacity: isLoading ? 0.6 : 1,
 						}}
-						onMouseOver={(e) => (e.target.style.opacity = "0.85")}
-						onMouseOut={(e) => (e.target.style.opacity = "1")}
+						onMouseOver={(e) => !isLoading && (e.target.style.opacity = "0.85")}
+						onMouseOut={(e) => !isLoading && (e.target.style.opacity = "1")}
 					>
-						 Download Data
+						Download Data
 					</button>
 				</div>
 			</div>
@@ -114,25 +88,8 @@ export default function DashboardPage({ entries, onAdd }) {
 				</div>
 			)}
 
-			{/* Sample data message */}
-			{sampleMsg && (
-				<div
-					style={{
-						padding: "12px 14px",
-						borderRadius: 8,
-						fontSize: 13,
-						fontWeight: 500,
-						background: sampleMsg.success ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)",
-						border: `1px solid ${sampleMsg.success ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`,
-						color: sampleMsg.success ? "var(--color-green)" : "var(--color-red)",
-					}}
-				>
-					{sampleMsg.success ? "✓" : "✕"} {sampleMsg.message}
-				</div>
-			)}
-
 			{/* Add entry */}
-			<AddEntry entries={entries} onAdd={onAdd} />
+			<AddEntry onAdd={onAdd} />
 
 			{/* Stat cards */}
 			<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "1rem" }}>

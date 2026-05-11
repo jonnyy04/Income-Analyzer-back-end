@@ -1,6 +1,6 @@
 import Icon from "./Icon";
 
-export default function Sidebar({ page, setPage, dark, toggleDark, entryCount }) {
+export default function Sidebar({ page, setPage, dark, toggleDark, entryCount, user, onLogout }) {
 	return (
 		<aside
 			style={{
@@ -46,12 +46,27 @@ export default function Sidebar({ page, setPage, dark, toggleDark, entryCount })
 								textTransform: "uppercase",
 								letterSpacing: "0.08em",
 							}}
-						>
-						
-						</div>
+						></div>
 					</div>
 				</div>
 			</div>
+
+			{/* User Info */}
+			{user && (
+				<div
+					style={{
+						background: "var(--color-bg)",
+						padding: "0.75rem",
+						borderRadius: "8px",
+						marginBottom: "1rem",
+						border: "1px solid var(--color-border)",
+					}}
+				>
+					<div style={{ fontSize: "0.75rem", color: "var(--color-text3)", marginBottom: "0.25rem" }}>Logged in as</div>
+					<div style={{ fontWeight: 600, fontSize: "0.875rem", color: "var(--color-text)" }}>{user.userName}</div>
+					<div style={{ fontSize: "0.75rem", color: "var(--color-text3)" }}>Role: {user.role}</div>
+				</div>
+			)}
 
 			{/* Nav label */}
 			<div
@@ -83,6 +98,25 @@ export default function Sidebar({ page, setPage, dark, toggleDark, entryCount })
 					<Icon name={dark ? "sun" : "moon"} size={15} />
 					{dark ? "Light Mode" : "Dark Mode"}
 				</button>
+
+				{onLogout && (
+					<button
+						className="btn-ghost"
+						style={{
+							width: "100%",
+							display: "flex",
+							alignItems: "center",
+							gap: 8,
+							marginTop: "0.5rem",
+							color: "#ef4444",
+						}}
+						onClick={onLogout}
+					>
+						<Icon name="logout" size={15} />
+						Logout
+					</button>
+				)}
+
 				<div style={{ fontSize: 10, color: "var(--color-text3)", textAlign: "center", marginTop: 10 }}>
 					{entryCount} entries · {new Date().getFullYear()}
 				</div>

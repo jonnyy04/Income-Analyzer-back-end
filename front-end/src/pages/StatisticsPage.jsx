@@ -9,6 +9,7 @@ function TableTab({ entries, onDelete }) {
 	const [filterMonth, setFilterMonth] = useState("all");
 	const [filterYear, setFilterYear] = useState("all");
 	const [deleteConfirm, setDeleteConfirm] = useState(null);
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	const years = useMemo(() => [...new Set(entries.map((e) => e.year))].sort((a, b) => b - a), [entries]);
 
@@ -25,10 +26,17 @@ function TableTab({ entries, onDelete }) {
 		setDeleteConfirm({ id: entryId, date: entryDate });
 	};
 
-	const confirmDelete = () => {
+	const confirmDelete = async () => {
 		if (deleteConfirm) {
-			onDelete(deleteConfirm.id);
-			setDeleteConfirm(null);
+			setIsDeleting(true);
+			try {
+				await onDelete(deleteConfirm.id);
+				setDeleteConfirm(null);
+			} catch (error) {
+				console.error("Failed to delete entry:", error);
+			} finally {
+				setIsDeleting(false);
+			}
 		}
 	};
 
@@ -155,6 +163,7 @@ function TableTab({ entries, onDelete }) {
 						<div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
 							<button
 								onClick={() => setDeleteConfirm(null)}
+								disabled={isDeleting}
 								style={{
 									padding: "8px 16px",
 									background: "var(--color-surface2)",
@@ -163,23 +172,19 @@ function TableTab({ entries, onDelete }) {
 									borderRadius: 8,
 									fontSize: 13,
 									fontWeight: 600,
-									cursor: "pointer",
+									cursor: isDeleting ? "not-allowed" : "pointer",
 									transition: "all 0.2s",
 									fontFamily: "DM Sans, sans-serif",
+									opacity: isDeleting ? 0.6 : 1,
 								}}
-								onMouseOver={(e) => {
-									e.target.style.background = "var(--color-border)";
-									e.target.style.color = "var(--color-text)";
-								}}
-								onMouseOut={(e) => {
-									e.target.style.background = "var(--color-surface2)";
-									e.target.style.color = "var(--color-text2)";
-								}}
+								onMouseOver={(e) => !isDeleting && ((e.target.style.background = "var(--color-border)"), (e.target.style.color = "var(--color-text)"))}
+								onMouseOut={(e) => !isDeleting && ((e.target.style.background = "var(--color-surface2)"), (e.target.style.color = "var(--color-text2)"))}
 							>
 								Cancel
 							</button>
 							<button
 								onClick={confirmDelete}
+								disabled={isDeleting}
 								style={{
 									padding: "8px 16px",
 									background: "var(--color-red-light)",
@@ -188,20 +193,15 @@ function TableTab({ entries, onDelete }) {
 									borderRadius: 8,
 									fontSize: 13,
 									fontWeight: 600,
-									cursor: "pointer",
+									cursor: isDeleting ? "not-allowed" : "pointer",
 									transition: "all 0.2s",
 									fontFamily: "DM Sans, sans-serif",
+									opacity: isDeleting ? 0.7 : 1,
 								}}
-								onMouseOver={(e) => {
-									e.target.style.opacity = "0.8";
-									e.target.style.transform = "scale(1.02)";
-								}}
-								onMouseOut={(e) => {
-									e.target.style.opacity = "1";
-									e.target.style.transform = "scale(1)";
-								}}
+								onMouseOver={(e) => !isDeleting && ((e.target.style.opacity = "0.8"), (e.target.style.transform = "scale(1.02)"))}
+								onMouseOut={(e) => !isDeleting && ((e.target.style.opacity = "1"), (e.target.style.transform = "scale(1)"))}
 							>
-								Delete
+								{isDeleting ? "Deleting..." : "Delete"}
 							</button>
 						</div>
 					</div>

@@ -1,32 +1,34 @@
 import { useState } from "react";
-import { createEntry, fmt } from "../utils/helpers";
+import { fmt } from "../utils/helpers";
 import Icon from "./Icon";
 
-export default function AddEntry({ entries, onAdd }) {
+export default function AddEntry({ onAdd }) {
 	const [balance, setBalance] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [msg, setMsg] = useState(null);
 
-	const handle = () => {
+	const handle = async () => {
 		const val = parseFloat(balance);
 		if (isNaN(val) || val < 0) {
 			setMsg({ type: "error", text: "Please enter a valid balance." });
 			return;
 		}
 		setLoading(true);
-		setTimeout(() => {
-			const entry = createEntry(entries, val);
-			onAdd(entry);
+		try {
+			const entry = await onAdd(val);
 			setBalance("");
 			const text = entry.dailyProfit > 0 ? `+$${fmt(entry.dailyProfit)} added to this month's salary!` : "Entry saved — no increase detected.";
 			setMsg({ type: entry.dailyProfit > 0 ? "success" : "neutral", text });
-			setLoading(false);
 			setTimeout(() => setMsg(null), 3500);
-		}, 300);
+		} catch (error) {
+			setMsg({ type: "error", text: error.message || "Failed to add entry" });
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const handleKey = (e) => {
-		if (e.key === "Enter") handle();
+		if (e.key === "Enter" && !loading) handle();
 	};
 
 	return (
@@ -53,6 +55,7 @@ export default function AddEntry({ entries, onAdd }) {
 						onChange={(e) => setBalance(e.target.value)}
 						onKeyDown={handleKey}
 						placeholder="0.00"
+						disabled={loading}
 						style={{
 							width: "100%",
 							padding: "10px 12px 10px 28px",
@@ -65,6 +68,8 @@ export default function AddEntry({ entries, onAdd }) {
 							outline: "none",
 							backdropFilter: "blur(4px)",
 							fontFamily: "DM Sans, sans-serif",
+							opacity: loading ? 0.6 : 1,
+							cursor: loading ? "not-allowed" : "text",
 						}}
 					/>
 				</div>
@@ -79,7 +84,7 @@ export default function AddEntry({ entries, onAdd }) {
 						borderRadius: 8,
 						fontWeight: 700,
 						fontSize: 14,
-						cursor: "pointer",
+						cursor: loading ? "not-allowed" : "pointer",
 						whiteSpace: "nowrap",
 						display: "flex",
 						alignItems: "center",
@@ -87,10 +92,11 @@ export default function AddEntry({ entries, onAdd }) {
 						boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
 						transition: "transform 0.15s",
 						fontFamily: "DM Sans, sans-serif",
+						opacity: loading ? 0.7 : 1,
 					}}
 				>
 					<Icon name="plus" size={16} />
-					Add
+					{loading ? "Adding..." : "Add"}
 				</button>
 			</div>
 

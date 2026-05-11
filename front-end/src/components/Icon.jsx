@@ -10,6 +10,7 @@ const paths = {
 	calendar: "M3 4h18v18H3zM16 2v4M8 2v4M3 10h18",
 	award: "M12 15l-4 6h8l-4-6zM12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
 	chart: "M3 3v18h18",
+	logout: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 13l4-4m0 0l-4-4m4 4H9",
 };
 
 export default function Icon({ name, size = 18, strokeWidth = 2 }) {
