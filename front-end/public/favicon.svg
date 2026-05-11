@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="98" fill="#2563eb" opacity="0.1" stroke="#2563eb" stroke-width="2"/>
+  
+  <!-- Main icon: Upward trending chart with dollar sign -->
+  <g transform="translate(100, 100)">
+    <!-- Dollar sign -->
+    <circle cx="0" cy="0" r="45" fill="#2563eb"/>
+    
+    <!-- Dollar symbol in white -->
+    <text x="0" y="0" font-size="55" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif">$</text>
+    
+    <!-- Upward trend arrow -->
+    <g transform="translate(35, -40)" opacity="0.9">
+      <path d="M 0 15 L 0 0 L -10 10" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+</svg>
