@@ -15,6 +15,7 @@ export default function App() {
 	const [authPage, setAuthPage] = useState("login"); // "login" or "signup"
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [user, setUser] = useState(null);
+	const [sessionError, setSessionError] = useState(null);
 
 	// Check if user is already authenticated on mount
 	useEffect(() => {
@@ -22,11 +23,28 @@ export default function App() {
 			setIsAuthenticated(true);
 			setUser(authService.getUser());
 		}
+
+		// Register callback for unauthorized (401) errors
+		authService.setOnUnauthorizedCallback(() => {
+			setSessionError("Your session has expired. Please login again.");
+			handleLogout();
+		});
 	}, []);
+
+	// Clear session error after 5 seconds
+	useEffect(() => {
+		if (sessionError) {
+			const timer = setTimeout(() => {
+				setSessionError(null);
+			}, 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [sessionError]);
 
 	const handleLoginSuccess = (response) => {
 		setIsAuthenticated(true);
 		setUser(authService.getUser());
+		setSessionError(null);
 	};
 
 	const handleSignupSuccess = () => {
@@ -53,6 +71,22 @@ export default function App() {
 			<Sidebar page={page} setPage={setPage} dark={dark} toggleDark={toggleDark} entryCount={entries.length} user={user} onLogout={handleLogout} />
 
 			<main style={{ flex: 1, padding: "2rem", maxWidth: 900, overflowX: "hidden" }}>
+				{sessionError && (
+					<div
+						style={{
+							padding: "12px 14px",
+							borderRadius: 8,
+							fontSize: 13,
+							fontWeight: 500,
+							background: "rgba(239,68,68,0.1)",
+							border: "1px solid rgba(239,68,68,0.3)",
+							color: "var(--color-red)",
+							marginBottom: "1rem",
+						}}
+					>
+						⚠️ {sessionError}
+					</div>
+				)}
 				{error && (
 					<div
 						style={{

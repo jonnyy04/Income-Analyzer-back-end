@@ -1,7 +1,22 @@
 // API service for authentication
 const API_BASE_URL = "http://localhost:5200/api";
 
+// Callback for unauthorized errors
+let onUnauthorizedCallback = null;
+
 export const authService = {
+	// Set callback for when 401 is received
+	setOnUnauthorizedCallback(callback) {
+		onUnauthorizedCallback = callback;
+	},
+
+	// Trigger unauthorized callback
+	triggerUnauthorized() {
+		if (onUnauthorizedCallback) {
+			onUnauthorizedCallback();
+		}
+	},
+
 	// Register a new user
 	async register(userData) {
 		try {

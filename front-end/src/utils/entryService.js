@@ -2,6 +2,22 @@ import { authService } from "./authService";
 
 const API_BASE_URL = "http://localhost:5200/api";
 
+// Helper function to handle API responses and check for 401
+async function handleResponse(response) {
+	if (response.status === 401) {
+		// Token expired or invalid - trigger logout
+		authService.triggerUnauthorized();
+		throw new Error("Session expired. Please login again.");
+	}
+
+	if (!response.ok) {
+		const error = await response.json().catch(() => ({}));
+		throw new Error(error.message || `Error: ${response.status}`);
+	}
+
+	return response;
+}
+
 export const entryService = {
 	// Get all entries for the authenticated user
 	async getAllEntries(pageNumber = 1, pageSize = 100, month = null, year = null) {
@@ -24,10 +40,7 @@ export const entryService = {
 				},
 			});
 
-			if (!response.ok) {
-				throw new Error("Failed to fetch entries");
-			}
-
+			await handleResponse(response);
 			return await response.json();
 		} catch (error) {
 			throw error;
@@ -50,10 +63,7 @@ export const entryService = {
 				},
 			});
 
-			if (!response.ok) {
-				throw new Error("Failed to fetch entry");
-			}
-
+			await handleResponse(response);
 			return await response.json();
 		} catch (error) {
 			throw error;
@@ -77,11 +87,7 @@ export const entryService = {
 				body: JSON.stringify({ balance: parseFloat(balance) }),
 			});
 
-			if (!response.ok) {
-				const error = await response.json();
-				throw new Error(error.message || "Failed to create entry");
-			}
-
+			await handleResponse(response);
 			return await response.json();
 		} catch (error) {
 			throw error;
@@ -105,11 +111,7 @@ export const entryService = {
 				body: JSON.stringify({ balance: parseFloat(balance) }),
 			});
 
-			if (!response.ok) {
-				const error = await response.json();
-				throw new Error(error.message || "Failed to update entry");
-			}
-
+			await handleResponse(response);
 			return await response.json();
 		} catch (error) {
 			throw error;
@@ -131,10 +133,7 @@ export const entryService = {
 				},
 			});
 
-			if (!response.ok) {
-				throw new Error("Failed to delete entry");
-			}
-
+			await handleResponse(response);
 			return true;
 		} catch (error) {
 			throw error;
