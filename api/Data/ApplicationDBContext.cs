@@ -9,8 +9,15 @@ namespace api.Data
     {
         public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions) { }
 
-        // ✅ New for Lab 7
+        // New for Lab 7
         public DbSet<Entry> Entries { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.ConfigureWarnings(w =>
+                w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -19,7 +26,7 @@ namespace api.Data
             // Entry → AppUser relationship
             builder.Entity<Entry>()
                 .HasOne(e => e.AppUser)
-                .WithMany()
+                .WithMany(a => a.Entries)
                 .HasForeignKey(e => e.AppUserId)
                 .OnDelete(DeleteBehavior.Cascade);
 

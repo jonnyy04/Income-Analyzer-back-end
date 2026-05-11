@@ -8,7 +8,7 @@ namespace api.Models
     {
         public int Id { get; set; }
         public string Date { get; set; } = string.Empty;
-        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+        public DateTime Timestamp { get; set; }
         public decimal Balance { get; set; }
         public decimal DailyProfit { get; set; }
         public int Month { get; set; }

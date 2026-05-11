@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>api</name>
+    </assembly>
+    <members>
+        <member name="M:api.Controllers.AccountController.Register(api.Dtos.Account.RegisterDto)">
+            <summary>
+            Register a new user account.
+            </summary>
+            <param name="dto">Registration details (userName, email, password)</param>
+            <returns>Success message or error</returns>
+        </member>
+        <member name="M:api.Controllers.EntryController.GetAll(api.Helpers.EntryQueryObject)">
+            <summary>
+            Get all entries for the authenticated user.
+            Supports filtering by month/year and pagination (?pageNumber=1&amp;pageSize=20).
+            </summary>
+        </member>
+        <member name="M:api.Controllers.EntryController.GetById(System.Int32)">
+            <summary>
+            Get a single entry by ID (must belong to the authenticated user).
+            </summary>
+        </member>
+        <member name="M:api.Controllers.EntryController.Create(api.Dtos.Entry.CreateEntryDto)">
+            <summary>
+            Create a new balance entry. DailyProfit is auto-calculated vs the previous entry.
+            </summary>
+        </member>
+        <member name="M:api.Controllers.EntryController.Update(System.Int32,api.Dtos.Entry.UpdateEntryDto)">
+            <summary>
+            Update the balance of an existing entry. Recalculates DailyProfit automatically.
+            </summary>
+        </member>
+        <member name="M:api.Controllers.EntryController.Delete(System.Int32)">
+            <summary>
+            Delete an entry by ID. ADMIN role can delete any entry; USER only their own.
+            </summary>
+        </member>
+        <member name="M:api.Controllers.TokenController.GetToken(api.Controllers.TokenRequestDto)">
+             <summary>
+             Returns a JWT for the given credentials and requested role.
+             Role must be "ADMIN" or "USER". Expiry: 1 minute (demo).
+             </summary>
+             <remarks>
+             Example request body:
+            
+                 POST /api/token
+                 {
+                     "userName": "alice",
+                     "password": "Password123!",
+                     "role": "ADMIN"
+                 }
+            
+             The returned token must be sent as: Authorization: Bearer {token}
+             </remarks>
+        </member>
+        <member name="T:api.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:api.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:api.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:api.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:api.Service.TokenService.CreateToken(api.Models.AppUser)">
+            <summary>
+            Creates a JWT for an authenticated AppUser.
+            Expiry is set to 1 minute for demo purposes (configurable via JWT:ExpiryMinutes).
+            </summary>
+        </member>
+        <member name="M:api.Service.TokenService.CreateTokenForRole(System.String,System.String,System.String)">
+            <summary>
+            Creates a JWT directly from a role string (used by the /token endpoint).
+            Does NOT require a full AppUser — suitable for the lab's /token flow.
+            </summary>
+        </member>
+        <member name="T:Program">
+            <summary>
+            Auto-generated public partial Program class for top-level statement apps.
+            </summary>
+        </member>
+    </members>
+</doc>
